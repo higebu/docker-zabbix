@@ -1,0 +1,47 @@
+server {
+	root /usr/share/nginx/html/zabbix;
+        server_name localhost;
+ 
+        location /zabbix {
+		index index.php;
+        }
+ 
+	location ^~ /zabbix/api_jsonrpc.php {
+		root /usr/share/nginx/html/zabbix;
+		fastcgi_read_timeout 1800;
+		fastcgi_keep_conn on;
+		fastcgi_pass   unix:/var/run/php5-fpm.sock;
+		fastcgi_index  index.php;
+		fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param PHP_VALUE "
+post_max_size = 100M
+upload_max_filesize = 100M
+max_execution_time = 1800
+max_input_time = 1800
+date.timezone = Asia/Tokyo
+";
+		include        fastcgi_params;
+		add_header 'Access-Control-Allow-Origin' '*';
+		add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+		add_header 'Access-Control-Allow-Headers' 'Content-Type';
+		fastcgi_pass_request_headers on;
+		fastcgi_param CONTENT_TYPE "application/json";
+	}
+ 
+	location ~ \.php$ {
+		root /usr/share/nginx/html/zabbix;
+		fastcgi_read_timeout 1800;
+		fastcgi_keep_conn on;
+		fastcgi_pass   unix:/var/run/php5-fpm.sock;
+		fastcgi_index  index.php;
+		fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param PHP_VALUE "
+post_max_size = 100M
+upload_max_filesize = 100M
+max_execution_time = 1800
+max_input_time = 1800
+date.timezone = Asia/Tokyo
+";
+		include        fastcgi_params;
+	}
+}
